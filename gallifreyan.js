@@ -70,8 +70,8 @@ if (typeof exports !== 'undefined') {
      * Drawable for letters like 'y' and the similar vowel
      * @constructor
      */
-    g.CrossCircle = function(sizeFactor) {
-        this.factor = sizeFactor;
+    g.CrossCircle = function(scale) {
+        this.factor = scale;
     };
     g.CrossCircle.prototype.draw = function(ctx, width, height, w2, h2) {
         ctx.beginPath();
@@ -83,8 +83,8 @@ if (typeof exports !== 'undefined') {
      * Drawable for and the similar vowel
      * @constructor
      */
-    g.OutCircle = function(sizeFactor) {
-        this.factor = sizeFactor;
+    g.OutCircle = function(scale) {
+        this.factor = scale;
     };
     g.OutCircle.prototype.draw = function(ctx, width, height, w2, h2) {
         var w3 = w2 * this.factor;
