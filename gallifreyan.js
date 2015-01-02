@@ -134,13 +134,14 @@ if (typeof exports !== 'undefined') {
         ctx.save();
         ctx.translate(0, decorOffset);
         ctx.rotate(-this.rot);
-        var y = -h2;
+        var y1 = -h2;
+        var y2 = y1 - ctx.radius*2;
         for( var i = 0; i < this.count; i++ ) {
             ctx.save();
             ctx.rotate(this.rot * i);
             ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(0, y-1000);
+            ctx.moveTo(0, y1);
+            ctx.lineTo(0, y2);
             ctx.stroke();
             ctx.restore();
         }
