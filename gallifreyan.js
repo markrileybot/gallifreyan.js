@@ -57,13 +57,24 @@ if (typeof exports !== 'undefined') {
     g.JoinHalfCircle = function() {};
     g.JoinHalfCircle.prototype.clip = function(ctx, width, height, w2, h2) {
         ctx.beginPath();
-        ctx.arc(0, 0, w2, 0, Math.PI*2, true);
+        ctx.arc(0, 0, w2 - 8, 0, Math.PI*2, true);
         ctx.clip();
     };
     g.JoinHalfCircle.prototype.draw = function(ctx, width, height, w2, h2) {
+        ctx.save();
+        ctx.fillStyle = "#000000";
         ctx.beginPath();
         ctx.arc(0, 0, w2, 0, Math.PI*2, true);
-        ctx.stroke();
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.translate(0, - 4);
+        ctx.beginPath();
+        ctx.arc(0, 0, w2 - 8, 0, Math.PI*2, true);
+        ctx.fill();
+        ctx.restore();
         return 0;
     };
     /**
@@ -74,9 +85,19 @@ if (typeof exports !== 'undefined') {
         this.factor = scale;
     };
     g.CrossCircle.prototype.draw = function(ctx, width, height, w2, h2) {
+        ctx.save();
+        ctx.fillStyle = "#000000";
         ctx.beginPath();
         ctx.arc(0, 0, w2 * this.factor, 0, Math.PI*2, true);
-        ctx.stroke();
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.translate(0, - 4);
+        ctx.beginPath();
+        ctx.arc(0, 0, w2 * this.factor - (8 * this.factor), 0, Math.PI*2, true);
+        ctx.fill();
+        ctx.restore();
         return 0;
     };
     /**
@@ -89,10 +110,18 @@ if (typeof exports !== 'undefined') {
     g.OutCircle.prototype.draw = function(ctx, width, height, w2, h2) {
         var w3 = w2 * this.factor;
         ctx.save();
-        ctx.translate(0, w3 + 10);
+        ctx.fillStyle = "#000000";
+        ctx.translate(0, w3 + 9);
         ctx.beginPath();
         ctx.arc(0, 0, w3, 0, Math.PI*2, true);
-        ctx.stroke();
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.translate(0, w3 + 6);
+        ctx.beginPath();
+        ctx.arc(0, 0, w3 - 6, 0, Math.PI*2, true);
+        ctx.fill();
         ctx.restore();
         return 0;
     };
@@ -107,9 +136,9 @@ if (typeof exports !== 'undefined') {
     };
     g.DecorDot.prototype.draw = function(ctx, width, height, w2, h2, decorOffset) {
         ctx.save();
-        ctx.translate(0, decorOffset);
+        ctx.translate(0, decorOffset + 5);
         ctx.rotate(-this.rot *.7);
-        var baseRad = .05 * height;
+        var baseRad = .05 * height + 3*2 - this.count*2;
         var y = -h2 + .12 * height;
         for( var i = this.count; i > 0; i-- ) {
             ctx.save();
@@ -132,16 +161,16 @@ if (typeof exports !== 'undefined') {
     };
     g.DecorLine.prototype.draw = function(ctx, width, height, w2, h2, decorOffset) {
         ctx.save();
+        ctx.lineWidth = 4;
         ctx.translate(0, decorOffset);
         ctx.rotate(-this.rot);
         var y1 = -h2;
-        var y2 = y1 - ctx.radius*2;
         for( var i = 0; i < this.count; i++ ) {
             ctx.save();
             ctx.rotate(this.rot * i);
+            ctx.translate(0, y1);
             ctx.beginPath();
-            ctx.moveTo(0, y1);
-            ctx.lineTo(0, y2);
+            ctx.arc(-ctx.radius*2, 0, ctx.radius*2, Math.PI * 1.5, 0, false);
             ctx.stroke();
             ctx.restore();
         }
@@ -156,7 +185,7 @@ if (typeof exports !== 'undefined') {
         this.joinHalfCircle = new g.JoinHalfCircle();
         this.crossCircle = new g.CrossCircle(1);
         this.crossVowel = new g.CrossCircle(.6);
-        this.outVowel = new g.OutCircle(.6);
+        this.outVowel = new g.OutCircle(.65);
         this.dot2 = new g.DecorDot(2);
         this.dot3 = new g.DecorDot(3);
         this.line1 = new g.DecorLine(1);
@@ -304,10 +333,21 @@ if (typeof exports !== 'undefined') {
 
         // origin at the center
         ctx.translate(w2, h2);
+
         // draw the letter ring
+        ctx.save();
+        ctx.fillStyle = "#000000";
         ctx.beginPath();
         ctx.arc(0, 0, w2, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath();
+        ctx.translate(-2, -2);
+        ctx.arc(0, 0, w2 - 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
 
         // draw each letter
         for( i = 0; i < len; i++ ) {
@@ -407,12 +447,28 @@ if (typeof exports !== 'undefined') {
         c = this.words;
         len = c.length;
 
+        ctx.lineWidth = 1;
+
+        ctx.save();
+        ctx.fillStyle = "#000000";
+        ctx.translate(300, 300);
+        ctx.beginPath();
+        ctx.arc(0, 0, 240, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.translate(298, 298);
+        ctx.beginPath();
+        ctx.arc(0, 0, 240 - 8, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.restore();
+
         ctx.save();
         ctx.clipWidth = 400;
         ctx.clipHeight = 400;
         ctx.translate(100, 100);
 
-        ctx.lineWidth = 1;
         for( i = 0; i < len; i++ ) {
             // todo save
             // todo rotate
@@ -420,15 +476,6 @@ if (typeof exports !== 'undefined') {
             c[i].draw(ctx);
             // todo restore
         }
-        ctx.restore();
-
-
-        ctx.save();
-        ctx.lineWidth = 1;
-        ctx.translate(300, 300);
-        ctx.beginPath();
-        ctx.arc(0, 0, 250, 0, Math.PI * 2, false);
-        ctx.stroke();
         ctx.restore();
     };
 
