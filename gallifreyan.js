@@ -453,14 +453,14 @@ if (typeof exports !== 'undefined') {
         ctx.fillStyle = "#000000";
         ctx.translate(300, 300);
         ctx.beginPath();
-        ctx.arc(0, 0, 240, 0, Math.PI * 2, false);
+        ctx.arc(0, 0, 235, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.restore();
         ctx.save();
         ctx.fillStyle = "#FFFFFF";
         ctx.translate(298, 298);
         ctx.beginPath();
-        ctx.arc(0, 0, 240 - 8, 0, Math.PI * 2, false);
+        ctx.arc(0, 0, 235 - 8, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.restore();
 
