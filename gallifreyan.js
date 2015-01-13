@@ -316,7 +316,7 @@ if (typeof exports !== 'undefined') {
 
         // number of segments.  Making this < 1 will squeeze the letters
         // together and make them a bit larger
-            segments = len * .6,
+            segments = len * .55,
 
         // Letter sizes and other measures
             charWidth = width / segments,
@@ -453,14 +453,14 @@ if (typeof exports !== 'undefined') {
         ctx.fillStyle = "#000000";
         ctx.translate(300, 300);
         ctx.beginPath();
-        ctx.arc(0, 0, 235, 0, Math.PI * 2, false);
+        ctx.arc(0, 0, 232, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.restore();
         ctx.save();
         ctx.fillStyle = "#FFFFFF";
         ctx.translate(298, 298);
         ctx.beginPath();
-        ctx.arc(0, 0, 235 - 8, 0, Math.PI * 2, false);
+        ctx.arc(0, 0, 232 - 8, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.restore();
 
