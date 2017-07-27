@@ -187,7 +187,7 @@ if (typeof exports !== 'undefined') {
      */
     g.DecorLine = function(count) {
         this.count = count;
-        this.segment = Math.PI / 3;
+        this.segment = Math.PI / 3.5;
         this.rot = this.segment / count;
     };
     g.DecorLine.prototype.draw = function(ctx, width, height, w2, h2, decorOffset) {
@@ -217,7 +217,7 @@ if (typeof exports !== 'undefined') {
         this.inCircle = new g.InCircle(.85);
         this.crossCircle = new g.CrossCircle(1);
         this.crossVowel = new g.CrossCircle(.6);
-        this.outVowel = new g.OutCircle(.5);
+        this.outVowel = new g.OutCircle(.6);
         this.dot2 = new g.DecorDot(2);
         this.dot3 = new g.DecorDot(3);
         this.line1 = new g.DecorLine(1);
@@ -352,7 +352,7 @@ if (typeof exports !== 'undefined') {
 
         // number of segments.  Making this < 1 will squeeze the letters
         // together and make them a bit larger
-            segments = (len - 1) * .7,
+            segments = len * .55,
 
         // Letter sizes and other measures
             charWidth = width / segments,
@@ -434,30 +434,30 @@ if (typeof exports !== 'undefined') {
 
         // Erase the sections of the word ring that should not exist.
         // This is kind of crappy but its the easiest thing to do.
-        //for( i = 0; i < len; i++ ) {
-        //    if( (c[i].info.etc & g.ETC_NO_CLIP) == 0 ) {
-        //        ctx.save();
-        //            // rotate about the origin so that the current
-        //            // letter is at the bottom of the word
-        //            ctx.rotate(-charRads * i);
-        //
-        //            ctx.save();
-        //                // position the letter origin.
-        //                ctx.translate(charOriginX, charOriginY);
-        //                // clip for the word arc
-        //                c[i].clip(ctx);
-        //                // now overwrite the word arc within the clip
-        //                ctx.strokeStyle = "#FFFFFF";
-        //                ctx.lineWidth = lineWidth + 2;
-        //                ctx.globalCompositeOperation = 'xor';
-        //                ctx.beginPath();
-        //                ctx.arc(-charOriginX, -charOriginY, w2, segRads, segRads + charRads, false);
-        //                ctx.stroke();
-        //            ctx.restore();
-        //
-        //        ctx.restore();
-        //    }
-        //}
+/*        for( i = 0; i < len; i++ ) {
+            if( (c[i].info.etc & g.ETC_NO_CLIP) == 0 ) {
+                ctx.save();
+                    // rotate about the origin so that the current
+                    // letter is at the bottom of the word
+                    ctx.rotate(-charRads * i);
+        
+                    ctx.save();
+                        // position the letter origin.
+                        ctx.translate(charOriginX, charOriginY);
+                        // clip for the word arc
+                        c[i].clip(ctx);
+                        // now overwrite the word arc within the clip
+                        ctx.strokeStyle = "#FFFFFF";
+                        ctx.lineWidth = lineWidth + 2;
+                        ctx.globalCompositeOperation = 'xor';
+                        ctx.beginPath();
+                        ctx.arc(-charOriginX, -charOriginY, w2, segRads, segRads + charRads, false);
+                        ctx.stroke();
+                    ctx.restore();
+        
+               ctx.restore();
+            }
+        }*/
     };
 
     /**
