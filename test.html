@@ -6,15 +6,13 @@
 	<script>
         $(document).ready(function() {
             gallifrey.transliterate("TRASY").draw($("canvas")[0].getContext("2d"));
-
-            var svg = new C2S(600, 600);
-            gallifrey.transliterate("TRASY").draw(svg);
-            $("#svg").append(svg.getSerializedSvg(true));
+            gallifrey.transliterate("MARK").draw($("canvas")[1].getContext("2d"));
         });
 	</script>
 </head>
 <body>
 <canvas id="canvas" width="600" height="600"></canvas>
+<canvas id="canvas2" width="600" height="600"></canvas>
 <div id='svg'></div>
 </body>
 </html>

@@ -44,6 +44,9 @@ if (typeof exports !== 'undefined') {
         ctx.arc(0, -w2 + .05*width, w2, 0, Math.PI * 2, true);
         ctx.clip();
     };
+    g.JoinCircle.prototype.offset = function(ctx, width, height, w2, h2) {
+        return -w2 + .05*width;
+    };
     g.JoinCircle.prototype.draw = function(ctx, width, height, w2, h2) {
         ctx.beginPath();
         ctx.arc(0, -w2 + .05*width, w2, 0, Math.PI * 2, true);
@@ -104,6 +107,34 @@ if (typeof exports !== 'undefined') {
      * Drawable for and the similar vowel
      * @constructor
      */
+    g.InCircle = function(scale) {
+        this.factor = scale;
+    };
+    g.InCircle.prototype.offset = function(ctx, width, height, w2, h2) {
+        return -(w2 * this.factor) + 20;
+    };
+    g.InCircle.prototype.draw = function(ctx, width, height, w2, h2) {
+        var w3 = w2 * this.factor;
+        ctx.save();
+        ctx.fillStyle = "#000000";
+        ctx.translate(0, -w3 + 5);
+        ctx.beginPath();
+        ctx.arc(0, 0, w3, 0, Math.PI*2, true);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = "#FFFFFF";
+        ctx.translate(0, -w3 + 3);
+        ctx.beginPath();
+        ctx.arc(0, 0, w3 - 6, 0, Math.PI*2, true);
+        ctx.fill();
+        ctx.restore();
+        return -w3;
+    };
+    /**
+     * Drawable for and the similar vowel
+     * @constructor
+     */
     g.OutCircle = function(scale) {
         this.factor = scale;
     };
@@ -156,7 +187,7 @@ if (typeof exports !== 'undefined') {
      */
     g.DecorLine = function(count) {
         this.count = count;
-        this.segment = Math.PI / 3;
+        this.segment = Math.PI / 3.5;
         this.rot = this.segment / count;
     };
     g.DecorLine.prototype.draw = function(ctx, width, height, w2, h2, decorOffset) {
@@ -183,9 +214,10 @@ if (typeof exports !== 'undefined') {
     g.DrawableFactory = function() {
         this.joinCircle = new g.JoinCircle();
         this.joinHalfCircle = new g.JoinHalfCircle();
+        this.inCircle = new g.InCircle(.85);
         this.crossCircle = new g.CrossCircle(1);
         this.crossVowel = new g.CrossCircle(.6);
-        this.outVowel = new g.OutCircle(.65);
+        this.outVowel = new g.OutCircle(.6);
         this.dot2 = new g.DecorDot(2);
         this.dot3 = new g.DecorDot(3);
         this.line1 = new g.DecorLine(1);
@@ -194,6 +226,8 @@ if (typeof exports !== 'undefined') {
     };
     g.DrawableFactory.prototype.getShape = function(id) {
         switch(id) {
+            case g.BASE_SHAPE_INSIDE_CIRCLE:
+                return this.inCircle;
             case g.BASE_SHAPE_JOIN_CIRCLE:
                 return this.joinCircle;
             case g.BASE_SHAPE_JOIN_HALF_CIRCLE:
@@ -278,12 +312,14 @@ if (typeof exports !== 'undefined') {
 
             // draw the shape
             var decorOffset = 0;
-            if( this.info.shape ) {
+            if( ctx.decorOnly && this.info.decor && this.info.shape.offset ) {
+                decorOffset = this.info.shape.offset(ctx, width, height, w2, h2);
+            } else if( !ctx.decorOnly && this.info.shape ) {
                 decorOffset = this.info.shape.draw(ctx, width, height, w2, h2);
             }
 
             // decorate the shape
-            if( this.info.decor ) {
+            if( ctx.decorOnly && this.info.decor ) {
                 this.info.decor.draw(ctx, width, height, w2, h2, decorOffset);
             }
         }
@@ -305,7 +341,7 @@ if (typeof exports !== 'undefined') {
         }
     };
     g.Word.prototype.draw = function(ctx) {
-        var i,
+        var i, ii,
             c = this.chars,
             len = c.length,
             width = ctx.clipWidth,
@@ -321,7 +357,7 @@ if (typeof exports !== 'undefined') {
         // Letter sizes and other measures
             charWidth = width / segments,
             charHeight = height / segments,
-            charRads = Math.PI * 2 / len,
+            charRads = Math.PI * 2 / (len - 1),
             segRads = Math.PI / 2 - charRads / 2,
             charOriginX = 0,
             charOriginY = h2 - .05 * h2; // This should be 5% higher than the bottom of the word
@@ -350,7 +386,8 @@ if (typeof exports !== 'undefined') {
         ctx.restore();
 
         // draw each letter
-        for( i = 0; i < len; i++ ) {
+        ctx.decorOnly = false;
+        for( i = 0, ii = 0; i < len; i++, ii++ ) {
             ctx.save();
                 // clip the letter inside the word
                 if( (c[i].info.etc & g.ETC_NO_CLIP) == 0 ) {
@@ -361,7 +398,10 @@ if (typeof exports !== 'undefined') {
 
                 // rotate about the origin so that the current
                 // letter is at the bottom of the word
-                ctx.rotate(-charRads * i);
+                if( i > 0 && c[i].info.type == g.TYPE_VOWEL && (c[i-1].info.etc & g.ETC_VOWEL_ATTACH) != 0 ) {
+                    ii--;
+                }
+                ctx.rotate(-charRads * ii);
 
                 ctx.save();
                     // position the letter origin.
@@ -372,15 +412,35 @@ if (typeof exports !== 'undefined') {
             ctx.restore();
         }
 
+        ctx.decorOnly = true;
+        for( i = 0, ii = 0; i < len; i++, ii++ ) {
+            ctx.save();
+
+            // rotate about the origin so that the current
+            // letter is at the bottom of the word
+            if( i > 0 && c[i].info.type == g.TYPE_VOWEL && (c[i-1].info.etc & g.ETC_VOWEL_ATTACH) != 0 ) {
+                ii--;
+            }
+            ctx.rotate(-charRads * ii);
+
+            ctx.save();
+            // position the letter origin.
+            ctx.translate(charOriginX, charOriginY);
+            // draw the letter
+            c[i].draw(ctx);
+            ctx.restore();
+            ctx.restore();
+        }
+
         // Erase the sections of the word ring that should not exist.
         // This is kind of crappy but its the easiest thing to do.
-        for( i = 0; i < len; i++ ) {
+/*        for( i = 0; i < len; i++ ) {
             if( (c[i].info.etc & g.ETC_NO_CLIP) == 0 ) {
                 ctx.save();
                     // rotate about the origin so that the current
                     // letter is at the bottom of the word
                     ctx.rotate(-charRads * i);
-
+        
                     ctx.save();
                         // position the letter origin.
                         ctx.translate(charOriginX, charOriginY);
@@ -394,10 +454,10 @@ if (typeof exports !== 'undefined') {
                         ctx.arc(-charOriginX, -charOriginY, w2, segRads, segRads + charRads, false);
                         ctx.stroke();
                     ctx.restore();
-
-                ctx.restore();
+        
+               ctx.restore();
             }
-        }
+        }*/
     };
 
     /**
@@ -618,7 +678,7 @@ if (typeof exports !== 'undefined') {
             type:   g.TYPE_CONSONANT,
             shape:  g.DRAWABLE_FACTORY.getShape(g.BASE_SHAPE_JOIN_HALF_CIRCLE),
             decor:  g.DRAWABLE_FACTORY.getDecor(g.DECOR_DOT_3),
-            etc:    g.ETC_VOWEL_ATTACH
+            etc:    0
         },
         's': {
             type:   g.TYPE_CONSONANT,
